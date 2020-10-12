@@ -12,16 +12,17 @@ async function bootstrap() {
     try {
       const sw = new Stopwatch();
       sw.start();
-      const result = await core.call(new CreateDriverCommand({
+      const command = new CreateDriverCommand({
         name: 'Sergey',
         surname: 'Aslanov',
         license: 'XM123',
         phone: '+79645792790'
-      }));
+      });
+      const result = await core.call(command);
       console.log('millis:' , sw.elapsedMilliseconds);
       console.log(result);
       sw.reset();
-      await delay(1000);
+      await delay(5000);
     } catch (error) {
       console.log(error);
     }

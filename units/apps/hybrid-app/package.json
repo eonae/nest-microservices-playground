@@ -22,7 +22,9 @@
     "rimraf": "^3.0.2",
     "rxjs": "^6.6.3",
     "@skeleton/transport": "^1.0.0",
-    "@shared/hybrid-app": "^1.0.0"
+    "@shared/hybrid-app": "^1.0.0",
+    "@skeleton/logger": "^2.1.1",
+    "@skeleton/tracing": "^1.0.0"
   },
   "jest": {
     "moduleFileExtensions": [

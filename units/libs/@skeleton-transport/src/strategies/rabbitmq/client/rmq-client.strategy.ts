@@ -1,17 +1,17 @@
-import { Connection, Channel, connect } from 'amqplib';
-import { EventEmitter } from 'events';
-import { v4 } from 'uuid';
 import { EVENTS_EXCHANGE, RPC_EXCHANGE } from '../constants';
-import { RMQInitializer } from '../initializer';
-import { ClientStrategy } from '../../client.strategy';
-import { DefaultTrace, ITrace } from '../../../tracing';
+import { Connection, Channel, connect } from 'amqplib';
 import { RMQClientOptions } from './rmq-client.options';
+import { ClientStrategy } from '../../client.strategy';
+import { RMQInitializer } from '../initializer';
+import { ITrace } from '@skeleton/tracing';
+import { EventEmitter } from 'events';
 import {
   IDeserializer,
   ISerializer,
   DefaultSerializer,
   DefaultDeserializer
 } from '../../../serialization';
+import { v4 } from 'uuid';
 
 export class RMQClientStrategy implements ClientStrategy {
   private connection: Connection;
@@ -22,25 +22,20 @@ export class RMQClientStrategy implements ClientStrategy {
   private callbackQueue: string;
   private trace: ITrace;
 
-  get isInitialized (): boolean {
-    return !!this.connection;
-  }
-
   constructor (
     private options: RMQClientOptions
   ) {
     this.serializer = options.serializer || new DefaultSerializer();
     this.deserializer = options.deserializer || new DefaultDeserializer();
-    this.trace = options.trace || new DefaultTrace();
+    this.trace = options.trace || { getId: () => v4() };
     this.responses = new EventEmitter();
   }
 
   public async connect (): Promise<void> {
     this.connection = await connect(this.options.url);
-    this.channel = await this.connection.createChannel();
+    this.channel = await this.connection.createChannel();  
     const { callbackQueue } = await new RMQInitializer(this.channel).initializeClient();
     this.callbackQueue = callbackQueue;
-    console.log(this.callbackQueue);
     await this.channel.consume(this.callbackQueue, msg => {
       const messageId = msg.properties.messageId;
       this.responses.emit(messageId, msg.content);

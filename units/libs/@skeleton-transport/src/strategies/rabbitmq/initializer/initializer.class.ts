@@ -30,6 +30,7 @@ export class RMQInitializer implements IClientInitializer, IServerInitializer {
   public initializeServer = async (tag: string) => {
     await this.assertExchanges();
     const consumeQueue = tag + '_queue';
+    console.log('Asserting:', { consumeQueue, EVENTS_EXCHANGE, RPC_EXCHANGE, tag });
     await this.channel.assertQueue(consumeQueue);
     await this.channel.bindQueue(consumeQueue, EVENTS_EXCHANGE, '');
     await this.channel.bindQueue(consumeQueue, RPC_EXCHANGE, tag);

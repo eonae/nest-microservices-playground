@@ -6,21 +6,21 @@ async function bootstrap() {
 
 
   const bus = new EventBusClient(new RMQClientStrategy({
-    url: 'amqp://localhost',
-    timeout: 10000
+    url: 'amqp://localhost'
   }));
 
   await bus.init();
   let counter = 0;
   while (true) {
     try {
-      bus.publish(new InspectionEvent({
+      const event = new InspectionEvent({
         id: counter++,
         driverName: 'Sergey',
         type: 'before',
         result: true
-      }));
-      await delay(1000);
+      });
+      bus.publish(event);
+      await delay(5000);
     } catch (error) {
       console.log(error);
     }

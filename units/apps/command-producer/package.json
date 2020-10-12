@@ -25,7 +25,8 @@
     "rxjs": "^6.6.3",
     "uuid": "^8.3.1",
     "@skeleton/transport": "^1.0.0",
-    "@shared/hybrid-app": "^1.0.0"
+    "@shared/hybrid-app": "^1.0.0",
+    "@skeleton/tracing": "^1.0.0"
   },
   "jest": {
     "moduleFileExtensions": [
