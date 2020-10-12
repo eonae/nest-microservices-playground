@@ -10,7 +10,6 @@ import {
   ITrace,
   RMQClientOptions
 } from './support';
-import { Stopwatch } from '@libs/common';
 
 export class RMQClient<TIn, TOut> {
   private connection: Connection;

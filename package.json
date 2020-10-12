@@ -13,7 +13,7 @@
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
-    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "lint": "eslint \"units/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
@@ -21,6 +21,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "devDependencies": {
+    "lerna": "^3.22.1",
     "@nestjs/cli": "^7.5.1",
     "@nestjs/schematics": "^7.1.2",
     "@nestjs/testing": "^7.4.4",
@@ -49,15 +50,12 @@
       "json",
       "ts"
     ],
-    "rootDir": "src",
+    "rootDir": "units",
     "testRegex": ".spec.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
-  },
-  "dependencies": {
-    "lerna": "^3.22.1"
   }
 }
