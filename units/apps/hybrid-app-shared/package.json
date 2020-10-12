@@ -1,0 +1,16 @@
+{
+  "name": "@shared/hybrid-app",
+  "version": "1.0.0",
+  "description": "RabbitMQ custom strategy and client",
+  "main": "dist/index.js",
+  "scripts": {
+    "prebuild": "rm -rf dist",
+    "build": "tsc --project tsconfig.build.json",
+    "clean": "rm -rf dist && rm -rf node_modules"
+  },
+  "dependencies": {
+    "@skeleton/transport": "^1.0.0"
+  },
+  "author": "eonae",
+  "license": "ISC"
+}

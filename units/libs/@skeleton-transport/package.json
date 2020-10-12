@@ -1,0 +1,22 @@
+{
+  "name": "@skeleton/transport",
+  "version": "1.0.0",
+  "description": "RabbitMQ custom strategy and client",
+  "main": "dist/index.js",
+  "scripts": {
+    "prebuild": "rm -rf dist",
+    "build": "tsc --project tsconfig.build.json",
+    "clean": "rm -rf dist && rm -rf node_modules"
+  },
+  "dependencies": {
+    "@libs/common": "^2.1.1",
+    "@skeleton/logger": "^2.0.5",
+    "amqplib": "^0.6.0",
+    "uuid": "^8.3.1"
+  },
+  "devDependencies": {
+    "@types/uuid": "^8.3.0"
+  },
+  "author": "eonae",
+  "license": "ISC"
+}
