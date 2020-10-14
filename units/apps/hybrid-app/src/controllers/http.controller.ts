@@ -13,7 +13,7 @@ export class HttpController {
   ) { }
 
   @Get('/')
-  public async createDriver(input: CreateDriverInput): Promise<CreateDriverOutput> {
+  public async createDriver (input: CreateDriverInput): Promise<CreateDriverOutput> {
     this.logger.info('Processing http request...');
     return this.drivers.create(input);
   }

@@ -6,5 +6,5 @@ export class InspectionEvent implements DomainEvent {
 
   constructor (
     public readonly payload: InspectionEventPayload
-  ) { } 
+  ) { }
 }

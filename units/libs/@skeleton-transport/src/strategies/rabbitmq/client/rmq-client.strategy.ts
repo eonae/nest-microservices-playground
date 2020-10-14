@@ -1,25 +1,31 @@
-import { EVENTS_EXCHANGE, RPC_EXCHANGE } from '../constants';
 import { Connection, Channel, connect } from 'amqplib';
+import { ITrace } from '@skeleton/tracing';
+import { EventEmitter } from 'events';
+import { v4 } from 'uuid';
+import { EVENTS_EXCHANGE, RPC_EXCHANGE } from '../constants';
 import { RMQClientOptions } from './rmq-client.options';
 import { ClientStrategy } from '../../client.strategy';
 import { RMQInitializer } from '../initializer';
-import { ITrace } from '@skeleton/tracing';
-import { EventEmitter } from 'events';
 import {
   IDeserializer,
   ISerializer,
   DefaultSerializer,
   DefaultDeserializer
 } from '../../../serialization';
-import { v4 } from 'uuid';
 
 export class RMQClientStrategy implements ClientStrategy {
   private connection: Connection;
+
   private channel: Channel;
+
   private responses: EventEmitter;
+
   private serializer: ISerializer;
+
   private deserializer: IDeserializer;
+
   private callbackQueue: string;
+
   private trace: ITrace;
 
   constructor (
@@ -33,11 +39,11 @@ export class RMQClientStrategy implements ClientStrategy {
 
   public async connect (): Promise<void> {
     this.connection = await connect(this.options.url);
-    this.channel = await this.connection.createChannel();  
+    this.channel = await this.connection.createChannel();
     const { callbackQueue } = await new RMQInitializer(this.channel).initializeClient();
     this.callbackQueue = callbackQueue;
     await this.channel.consume(this.callbackQueue, msg => {
-      const messageId = msg.properties.messageId;
+      const { messageId } = msg.properties;
       this.responses.emit(messageId, msg.content);
       this.channel.ack(msg);
     }, { noAck: false });
@@ -51,7 +57,9 @@ export class RMQClientStrategy implements ClientStrategy {
   public send (tag: string, pattern: string, message: any): Promise<any> {
     const messageId = v4();
     const correlationId = this.trace.getId();
-    console.log({ tag, pattern, messageId, correlationId });
+    console.log({
+      tag, pattern, messageId, correlationId
+    });
     return new Promise((resolve, reject) => {
       this.responses.once(
         messageId,
@@ -63,7 +71,7 @@ export class RMQClientStrategy implements ClientStrategy {
         messageId,
         correlationId,
         headers: { 'x-pattern': pattern },
-        replyTo: this.callbackQueue 
+        replyTo: this.callbackQueue
       });
       console.log({ ok });
     });

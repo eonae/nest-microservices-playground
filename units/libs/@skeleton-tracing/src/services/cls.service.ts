@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { createHook, executionAsyncId } from 'async_hooks'; 
+import { createHook, executionAsyncId } from 'async_hooks';
 
 @Injectable()
 export class ContinuationLocalStorage {
@@ -20,7 +20,7 @@ export class ContinuationLocalStorage {
     createHook({
       init: (asyncId: number, type: string, parentId: number) => {
         if (this.contexts.has(parentId)) {
-          this.contexts.set(asyncId, this.contexts.get(parentId))
+          this.contexts.set(asyncId, this.contexts.get(parentId));
         }
       },
       destroy: (asyncId: number) => {
@@ -35,7 +35,7 @@ export class ContinuationLocalStorage {
     return context;
   }
 
-  public getContext (): any{
+  public getContext (): any {
     return this.contexts.get(executionAsyncId());
   }
 }

@@ -1,8 +1,9 @@
-import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
-import { ILogger, InjectLogger } from '@skeleton/logger';
-import { ContinuationLocalStorage } from '../services';
+import {
+  CallHandler, ExecutionContext, Injectable, NestInterceptor
+} from '@nestjs/common';
 import { IncomingMessage } from 'http';
 import { Observable } from 'rxjs';
+import { ContinuationLocalStorage } from '../services';
 
 export interface TracingMetadata {
   traceId: string;
@@ -27,8 +28,8 @@ export class TracingInterceptor implements NestInterceptor {
   }
 
   private parseRpcContext (rpcArgs: any): TracingMetadata {
-    const traceId = rpcArgs.properties['x-trace-id'] as string;
-    const userId = rpcArgs.properties['x-user-id'] as string;
+    const traceId = rpcArgs.properties['x-trace-id'];
+    const userId = rpcArgs.properties['x-user-id'];
     return {
       traceId,
       userId

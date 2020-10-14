@@ -13,6 +13,6 @@ export class DriversService {
   public async create (payload: CreateDriverInput): Promise<CreateDriverOutput> {
     console.log(this.trace.getId());
     this.logger.info('Creating driver...');
-    return { success: true }
+    return { success: true };
   }
 }

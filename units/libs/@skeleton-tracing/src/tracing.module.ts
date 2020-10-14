@@ -1,7 +1,8 @@
-import { DynamicModule, FactoryProvider, Module, Provider } from '@nestjs/common';
+import {
+  DynamicModule, FactoryProvider, Module, Provider
+} from '@nestjs/common';
 import { TRACE } from './constants';
-import { ContinuationLocalStorage } from './services';
-import { Trace } from './services';
+import { ContinuationLocalStorage, Trace } from './services';
 
 @Module({})
 export class TracingModule {
@@ -22,6 +23,6 @@ export class TracingModule {
       providers: [traceProvider, clsProvider],
       exports: [traceProvider, clsProvider],
       global: true
-    }
+    };
   }
 }

@@ -1,27 +1,28 @@
-import { Stopwatch, delay } from '@libs/common';
-import { RMQClientStrategy, ServiceClient } from '@skeleton/transport';
+import { delay } from '@libs/common';
 import { CoreCommand, CreateDriverCommand } from '@shared/hybrid-app';
+import { NestFactory } from '@nestjs/core';
+import { ClientsFactory } from '@skeleton/transport';
+import { ContinuationLocalStorage } from '@skeleton/tracing';
+import { v4 } from 'uuid';
+import { AppModule } from './app.module';
 
-async function bootstrap() {
-  const core = new ServiceClient<CoreCommand>(new RMQClientStrategy({
-    url: 'amqp://localhost',
-    timeout: 10000
-  }));
-  await core.init();
+async function bootstrap () {
+  const app = await NestFactory.createApplicationContext(AppModule);
+  const factory = app.get(ClientsFactory);
+  const cls = app.get(ContinuationLocalStorage);
+  const client = await factory.create<CoreCommand>();
+
   while (true) {
     try {
-      const sw = new Stopwatch();
-      sw.start();
+      cls.createContext().metadata = { traceId: v4() };
       const command = new CreateDriverCommand({
         name: 'Sergey',
         surname: 'Aslanov',
         license: 'XM123',
         phone: '+79645792790'
       });
-      const result = await core.call(command);
-      console.log('millis:' , sw.elapsedMilliseconds);
+      const result = await client.call(command);
       console.log(result);
-      sw.reset();
       await delay(5000);
     } catch (error) {
       console.log(error);

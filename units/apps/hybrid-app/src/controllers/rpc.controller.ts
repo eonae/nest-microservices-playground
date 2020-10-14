@@ -14,7 +14,7 @@ export class RpcController {
   ) { }
 
   @MessagePattern(CREATE_DRIVER_PATTERN)
-  public async createDriver(input: CreateDriverInput): Promise<CreateDriverOutput> {
+  public async createDriver (input: CreateDriverInput): Promise<CreateDriverOutput> {
     this.logger.info('Processing command...');
     return this.drivers.create(input);
   }

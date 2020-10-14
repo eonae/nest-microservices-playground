@@ -1,9 +1,9 @@
 import { Controller, UseInterceptors } from '@nestjs/common';
 import { EventPattern } from '@nestjs/microservices';
 import { InspectionEventPayload } from '@shared/hybrid-app';
-import { YandexIntegrationService } from '../services';
 import { InjectLogger, ILogger } from '@skeleton/logger';
 import { TracingInterceptor } from '@skeleton/tracing';
+import { YandexIntegrationService } from '../services';
 
 @Controller()
 @UseInterceptors(TracingInterceptor)
@@ -14,7 +14,7 @@ export class EventsController {
   ) { }
 
   @EventPattern('inspection')
-  public async handleInspectionEvent(payload: InspectionEventPayload): Promise<void> {
+  public async handleInspectionEvent (payload: InspectionEventPayload): Promise<void> {
     this.logger.info('Handling event...');
     await this.service.sendInspection(payload);
   }

@@ -17,6 +17,7 @@
     "@skeleton/configuration": "^2.1.1",
     "@skeleton/tracing": "^1.0.0",
     "amqplib": "^0.6.0",
+    "rxjs": "^6.6.3",
     "uuid": "^8.3.1"
   },
   "devDependencies": {

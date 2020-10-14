@@ -7,5 +7,5 @@ export abstract class CoreCommand implements Command {
   constructor (
     public readonly pattern: string,
     public readonly payload: any
-    ) { }
+  ) { }
 }

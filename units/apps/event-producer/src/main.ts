@@ -2,9 +2,7 @@ import { delay } from '@libs/common';
 import { RMQClientStrategy, EventBusClient } from '@skeleton/transport';
 import { InspectionEvent } from '@shared/hybrid-app';
 
-async function bootstrap() {
-
-
+async function bootstrap () {
   const bus = new EventBusClient(new RMQClientStrategy({
     url: 'amqp://localhost'
   }));

@@ -1,5 +1,5 @@
-import { IDeserializer, ISerializer } from '../../../serialization';
 import { ITrace } from '@skeleton/tracing';
+import { IDeserializer, ISerializer } from '../../../serialization';
 
 export interface RMQClientOptions {
   url: string;
