@@ -14,8 +14,9 @@ export class EventsController {
   ) { }
 
   @EventPattern('inspection')
-  public async handleInspectionEvent (payload: InspectionEventPayload): Promise<void> {
+  public handleInspectionEvent (payload: InspectionEventPayload): Promise<void> {
     this.logger.info('Handling event...');
-    await this.service.sendInspection(payload);
+    this.service.sendInspection(payload);
+    return Promise.resolve();
   }
 }

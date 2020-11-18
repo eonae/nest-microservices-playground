@@ -1,21 +1,22 @@
 import { Module } from '@nestjs/common';
 import { RMQClientStrategy, TransportModule } from '@skeleton/transport';
-
-import { TracingModule, Trace } from '@skeleton/tracing';
-import { AppConfiguration } from './app.config';
+import { Trace, TracingModule } from '@skeleton/tracing';
 
 @Module({
   imports: [
     TransportModule.forRootAsync({
-      inject: [AppConfiguration, 'TRACE'],
-      useFactory: (config: AppConfiguration, trace: Trace) => new RMQClientStrategy({
-        url: config.url,
+      inject: ['TRACE'],
+      useFactory: (trace: Trace) => new RMQClientStrategy({
+        /**
+         * We can inject some configuration service (and import corresponding module
+         * if needed)
+         */
+        url: 'amqp://localhost',
         timeout: 10000,
         trace
       })
     }),
     TracingModule.forRoot()
-  ],
-  providers: [AppConfiguration]
+  ]
 })
 export class AppModule { }

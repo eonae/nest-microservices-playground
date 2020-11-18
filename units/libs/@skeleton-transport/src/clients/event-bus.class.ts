@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientStrategy } from '../strategies';
 import { DomainEvent } from '../interfaces';
-import { TRANSPORT } from './transport.module';
+import { TRANSPORT } from './constants';
 
 @Injectable()
 export class EventBusClient {
@@ -9,9 +9,12 @@ export class EventBusClient {
     @Inject(TRANSPORT) private transport: ClientStrategy
   ) { }
 
-  public init = () => this.transport.connect();
+  public init = (): Promise<void> => this.transport.connect();
 
-  public close = () => this.transport.close();
+  public close = (): Promise<void> => this.transport.close();
 
-  public publish = (e: DomainEvent) => this.transport.publish(e.pattern, e.payload);
+  public publish<T> (event: DomainEvent<T>): Promise<void> {
+    const { pattern, payload } = event;
+    return this.transport.publish(pattern, payload);
+  }
 }

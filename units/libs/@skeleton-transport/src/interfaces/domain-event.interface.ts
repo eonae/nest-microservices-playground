@@ -1,4 +1,4 @@
-export interface DomainEvent {
+export interface DomainEvent<TPayload> {
   pattern: string;
-  payload: any;
+  payload: TPayload;
 }

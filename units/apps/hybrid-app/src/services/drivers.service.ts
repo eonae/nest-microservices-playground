@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 import { Injectable } from '@nestjs/common';
 import { CreateDriverInput, CreateDriverOutput } from '@shared/hybrid-app';
 import { InjectLogger, ILogger, ITrace } from '@skeleton/logger';
@@ -10,9 +12,9 @@ export class DriversService {
     @InjectTrace() private trace: ITrace
   ) { }
 
-  public async create (payload: CreateDriverInput): Promise<CreateDriverOutput> {
-    console.log(this.trace.getId());
+  public create (payload: CreateDriverInput): Promise<CreateDriverOutput> {
+    console.log(this.trace.getId(), payload);
     this.logger.info('Creating driver...');
-    return { success: true };
+    return Promise.resolve({ success: true });
   }
 }

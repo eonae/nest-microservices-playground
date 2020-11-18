@@ -16,8 +16,7 @@ export class TracingInterceptor implements NestInterceptor {
     private cls: ContinuationLocalStorage
   ) { }
 
-  public intercept (context: ExecutionContext, next: CallHandler): Observable<any> {
-    console.log('type:', context.getType());
+  public intercept (context: ExecutionContext, next: CallHandler): Observable<unknown> {
     const type = context.getType();
     const args = context.getArgs();
     const metadata = type === 'http'
@@ -27,7 +26,7 @@ export class TracingInterceptor implements NestInterceptor {
     return next.handle();
   }
 
-  private parseRpcContext (rpcArgs: any): TracingMetadata {
+  private parseRpcContext (rpcArgs: { properties: Record<string, string> }): TracingMetadata {
     const traceId = rpcArgs.properties['x-trace-id'];
     const userId = rpcArgs.properties['x-user-id'];
     return {

@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 import { Connection, Channel, connect } from 'amqplib';
 import { ITrace } from '@skeleton/tracing';
 import { EventEmitter } from 'events';
@@ -43,7 +45,7 @@ export class RMQClientStrategy implements ClientStrategy {
     const { callbackQueue } = await new RMQInitializer(this.channel).initializeClient();
     this.callbackQueue = callbackQueue;
     await this.channel.consume(this.callbackQueue, msg => {
-      const { messageId } = msg.properties;
+      const { messageId } = msg.properties as { messageId: string };
       this.responses.emit(messageId, msg.content);
       this.channel.ack(msg);
     }, { noAck: false });
@@ -54,11 +56,15 @@ export class RMQClientStrategy implements ClientStrategy {
     if (this.connection) await this.connection.close();
   }
 
-  public send (tag: string, pattern: string, message: any): Promise<any> {
+  public send<TInput, TOutput> (
+    service: string,
+    pattern: string,
+    message: TInput
+  ): Promise<TOutput> {
     const messageId = v4();
     const correlationId = this.trace.getId();
     console.log({
-      tag, pattern, messageId, correlationId
+      tag: service, pattern, messageId, correlationId
     });
     return new Promise((resolve, reject) => {
       this.responses.once(
@@ -67,7 +73,7 @@ export class RMQClientStrategy implements ClientStrategy {
       );
       setTimeout(() => reject(new Error('timeout')), this.options.timeout);
       const payload = this.serializer.serialize(message);
-      const ok = this.channel.publish(RPC_EXCHANGE, tag, payload, {
+      const ok = this.channel.publish(RPC_EXCHANGE, service, payload, {
         messageId,
         correlationId,
         headers: { 'x-pattern': pattern },
@@ -77,11 +83,15 @@ export class RMQClientStrategy implements ClientStrategy {
     });
   }
 
-  public async publish (pattern: string, message: any): Promise<void> {
+  public async publish<TPayload> (pattern: string, message: TPayload): Promise<void> {
     const payload = this.serializer.serialize(message);
     const ok = this.channel.publish(EVENTS_EXCHANGE, '', payload, {
       headers: { 'x-pattern': pattern }
     });
     console.log({ ok });
+    if (!ok) {
+      throw new Error('Something wrong with publishing event! Channel.publish return false');
+    }
+    return Promise.resolve();
   }
 }

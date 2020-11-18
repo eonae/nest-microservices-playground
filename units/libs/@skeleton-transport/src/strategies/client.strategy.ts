@@ -1,6 +1,6 @@
 export interface ClientStrategy {
   connect (): Promise<void>;
   close (): Promise<void>;
-  send (tag: string, pattern: string, message: any): Promise<any>;
-  publish (pattern: string, message: any): Promise<void>;
+  send <TCommand, TResult>(tag: string, pattern: string, message: TCommand): Promise<TResult>;
+  publish<TMessage> (pattern: string, message: TMessage): Promise<void>;
 }

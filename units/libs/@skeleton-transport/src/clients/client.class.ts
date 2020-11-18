@@ -6,9 +6,14 @@ export class Client<TCommand extends Command> {
     private readonly transport: ClientStrategy
   ) { }
 
-  public init = () => this.transport.connect();
+  public init = (): Promise<void> => this.transport.connect();
 
-  public close = () => this.transport.close();
+  public close = (): Promise<void> => this.transport.close();
 
-  public call = (c: TCommand) => this.transport.send(c.service, c.pattern, c.payload);
+  public call<TOutput> (command: TCommand): Promise<TOutput> {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const { service, pattern, payload } = command;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return this.transport.send<any, TOutput>(service, pattern, payload);
+  }
 }

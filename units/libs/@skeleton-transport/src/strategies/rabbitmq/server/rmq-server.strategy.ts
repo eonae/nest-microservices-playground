@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 import {
   connect, Connection, Channel, ConsumeMessage
 } from 'amqplib';
@@ -8,6 +10,12 @@ import { of } from 'rxjs';
 import { RMQServerOptions } from './rmq-server.options';
 import { RMQInitializer } from '../initializer';
 import { DefaultSerializer } from '../../../serialization';
+
+export interface MessageMetadata {
+  pattern: string;
+  replyTo: string;
+  messageId: string;
+}
 
 export class RMQServerStrategy extends Server implements CustomTransportStrategy {
   private server: Connection;
@@ -24,8 +32,11 @@ export class RMQServerStrategy extends Server implements CustomTransportStrategy
 
   public async listen (callback: () => void): Promise<void> {
     const { consumeQueue } = await this.init();
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     this.channel.consume(consumeQueue, async (msg: ConsumeMessage) => {
-      const { pattern, replyTo, messageId } = this.parseMetadata(msg);
+      const metadata = this.parseMetadata(msg);
+      console.log('Message metadata:', metadata);
+      const { pattern, replyTo, messageId } = metadata;
       const handler = this.findHandler(pattern);
       if (handler) {
         const result = await this.executeHandler(handler, msg);
@@ -34,7 +45,7 @@ export class RMQServerStrategy extends Server implements CustomTransportStrategy
         }
       }
       this.channel.ack(msg);
-    }, { noAck: false });
+    }, { noAck: false }).catch(err => console.log(err));
     callback();
   }
 
@@ -49,35 +60,34 @@ export class RMQServerStrategy extends Server implements CustomTransportStrategy
     return new RMQInitializer(this.channel).initializeServer(this.options.tag);
   }
 
-  private findHandler (pattern: string): MessageHandler<any, any, any> {
+  private findHandler (pattern: string): MessageHandler {
     const handler = this.getHandlers().get(pattern);
-    console.log(`Handler for pattern <${pattern}>${handler}` ? 'found!' : 'not found!');
+    console.log(`Handler for pattern <${pattern}> ${handler ? 'found!' : 'not found!'}`);
     return handler;
   }
 
   // Выполняет и оборачивает результат в объект Result
   private async executeHandler (
-    handler: MessageHandler<any, any, any>,
+    handler: MessageHandler,
     message: ConsumeMessage
-  ): Promise<any> {
-    console.log('Stream aqquired');
-    return (await handler(message)).pipe(
+  ): Promise<unknown> {
+    const stream$ = await handler(message);
+    console.log('Stream aquired');
+    return stream$.pipe(
       map(v => Result.data(v)),
       catchError(err => of(Result.error(err)))
     ).toPromise();
   }
 
-  private parseMetadata (msg: ConsumeMessage) {
-    const metadata = {
-      pattern: msg.properties.headers['x-pattern'],
-      replyTo: msg.properties.replyTo,
-      messageId: msg.properties.messageId
+  private parseMetadata (msg: ConsumeMessage): MessageMetadata {
+    return {
+      pattern: msg.properties.headers['x-pattern'] as string,
+      replyTo: msg.properties.replyTo as string,
+      messageId: msg.properties.messageId as string
     };
-    console.log('Message metadata:', metadata);
-    return metadata;
   }
 
-  private sendCallback (replyTo: string, messageId: string, result: any): void {
+  private sendCallback (replyTo: string, messageId: string, result: unknown): void {
     console.log('Sending callback');
     const buf = new DefaultSerializer().serialize(result);
     this.channel.sendToQueue(replyTo, buf, { messageId });

@@ -8,6 +8,7 @@ export class Trace {
   ) { }
 
   public getId (): string {
-    return this.cls.getContext()?.metadata?.traceId;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    return this.cls.getContext()?.metadata?.traceId as string;
   }
 }

@@ -1,14 +1,16 @@
-import { DynamicModule, FactoryProvider, Module } from '@nestjs/common';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { DynamicModule, FactoryProvider, ForwardReference, Module, Type } from '@nestjs/common';
+import { InjectorDependency } from '@nestjs/core/injector/injector';
 import { ClientStrategy } from '../strategies';
 import { ClientsFactory } from './clients.factory';
+import { TRANSPORT } from './constants';
 import { EventBusClient } from './event-bus.class';
 
 export interface TransportModuleAsyncOptions {
   useFactory: (...args: any[]) => ClientStrategy,
-  inject?: any[]
+  inject?: InjectorDependency[],
+  imports?: (Type<any> | DynamicModule | Promise<DynamicModule> | ForwardReference<any>)[]
 }
-
-export const TRANSPORT = 'CLIENT_TRANSPORT';
 
 // Well we could use decorators to inject specific clients
 // We could use unique injection token to allow multiple transports per application\
@@ -16,8 +18,8 @@ export const TRANSPORT = 'CLIENT_TRANSPORT';
 
 @Module({})
 export class TransportModule {
-  public static async forRootAsync (options: TransportModuleAsyncOptions): Promise<DynamicModule> {
-    const transportStrategyProvider: FactoryProvider = {
+  public static forRootAsync (options: TransportModuleAsyncOptions): DynamicModule {
+    const strategyProvider: FactoryProvider = {
       provide: TRANSPORT,
       inject: options.inject || [],
       useFactory: options.useFactory
@@ -25,8 +27,9 @@ export class TransportModule {
 
     return {
       module: TransportModule,
-      providers: [transportStrategyProvider, EventBusClient, ClientsFactory],
-      exports: [transportStrategyProvider, EventBusClient, ClientsFactory],
+      imports: options.imports,
+      providers: [strategyProvider, EventBusClient, ClientsFactory],
+      exports: [EventBusClient, ClientsFactory],
       global: true
     };
   }

@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 import { Channel } from 'amqplib';
 import { v4 } from 'uuid';
 import { EVENTS_EXCHANGE, RPC_EXCHANGE } from '../constants';
@@ -20,14 +22,14 @@ export class RMQInitializer implements IClientInitializer, IServerInitializer {
     await this.channel.assertExchange(RPC_EXCHANGE, 'direct');
   };
 
-  public initializeClient = async () => {
+  public initializeClient = async (): Promise<{ callbackQueue: string }> => {
     await this.assertExchanges();
     const callbackQueue = `callback_${v4()}`;
     await this.channel.assertQueue(callbackQueue, { exclusive: true });
     return { callbackQueue };
   };
 
-  public initializeServer = async (tag: string) => {
+  public initializeServer = async (tag: string): Promise<{ consumeQueue: string }> => {
     await this.assertExchanges();
     const consumeQueue = `${tag}_queue`;
     console.log('Asserting:', {
